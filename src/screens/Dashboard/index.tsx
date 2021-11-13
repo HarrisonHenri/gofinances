@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, Alert } from 'react-native'
 
 import { useFocusEffect } from '@react-navigation/native'
@@ -8,6 +8,7 @@ import { HighlightCard } from '../../components/HighlightCard'
 import { TransactionCard } from '../../components/TrasactionCard'
 import { HighlightsDTO } from '../../dtos/HighlightsDTO'
 import { StatementDTO } from '../../dtos/StatementDTO'
+import { useAuth } from '../../hooks/auth'
 import { api } from '../../services/api'
 import { formatAmount } from '../../utils/formatAmount'
 import { formatDate } from '../../utils/formatDate'
@@ -31,6 +32,8 @@ import {
 } from './styles'
 
 export function Dashboard() {
+  const { signOut } = useAuth()
+
   const [isLoading, setIsLoading] = useState(true)
   const [data, setData] = useState<StatementDTO[]>([])
   const [highlighData, setHighlighData] = useState<HighlightsDTO>(
@@ -39,7 +42,7 @@ export function Dashboard() {
 
   const theme = useTheme()
 
-  const fetchData = useCallback(async () => {
+  async function fetchData() {
     let deposits = 0
     let withdraws = 0
     let depositLastTransaction = 0
@@ -104,11 +107,17 @@ export function Dashboard() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  useEffect(() => {
+    fetchData()
   }, [])
 
-  useFocusEffect(() => {
-    fetchData()
-  })
+  useFocusEffect(
+    useCallback(() => {
+      fetchData()
+    }, []),
+  )
 
   if (isLoading) {
     return (
@@ -135,7 +144,7 @@ export function Dashboard() {
             </User>
           </UserInfo>
 
-          <LogoutButton>
+          <LogoutButton onPress={signOut}>
             <Icon name="power" />
           </LogoutButton>
         </UserWrapper>

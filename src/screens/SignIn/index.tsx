@@ -1,52 +1,67 @@
-import React, { useCallback } from 'react'
+import React from 'react'
 
-import { RFValue } from 'react-native-responsive-fontsize'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { useForm } from 'react-hook-form'
+import * as Yup from 'yup'
 
 import GoogleSvg from '../../assets/google.svg'
-import LogoSvg from '../../assets/logo.svg'
-import { SignInSocialButton } from '../../components/SignInSocialButton'
-import { api } from '../../services/api'
-import {
-  Container,
-  Header,
-  TitleWrapper,
-  Title,
-  SignInTitle,
-  Content,
-  ContentWrapper,
-} from './styles'
+import { ControlledInput } from '../../components/Forms/ControlledInput'
+import { SignInButton } from '../../components/SignInSocialButton'
+import { useAuth } from '../../hooks/auth'
+import { Container } from './styles'
+
+const schema = Yup.object().shape({
+  email: Yup.string().required('E-mail é obrigatório'),
+  password: Yup.string().required('Senha é obrigatório'),
+})
+
+interface FormData {
+  email: string
+  password: string
+}
 
 export function SignIn() {
-  const zumba = useCallback(async () => {
-    const uri = '/api/v1/sessions/google'
-    const response = await api.get(uri)
+  const { signIn } = useAuth()
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: yupResolver(schema),
+  })
 
-    console.log(response)
-  }, [])
+  function handleSignIn(form: FormData) {
+    reset()
+    signIn(form)
+  }
 
   return (
     <Container>
-      <Header>
-        <TitleWrapper>
-          <LogoSvg width={RFValue(120)} height={RFValue(68)} />
+      <ControlledInput
+        placeholder="E-mail"
+        keyboardType="email-address"
+        autoCorrect={false}
+        name="email"
+        autoCapitalize="none"
+        control={control}
+        error={errors.name && errors.email.message}
+      />
+      <ControlledInput
+        placeholder="Senha"
+        autoCorrect={false}
+        name="password"
+        autoCapitalize="none"
+        secureTextEntry
+        control={control}
+        error={errors.name && errors.password.message}
+      />
 
-          <Title>
-            Controle suas{'\n'}finanças de forma{'\n'}muito simples
-          </Title>
-        </TitleWrapper>
-
-        <SignInTitle>Faça seu login com{'\n'}uma das contas abaixo</SignInTitle>
-      </Header>
-
-      <Content>
-        <ContentWrapper>
-          <SignInSocialButton
-            title="Entrar com Google"
-            svg={GoogleSvg}
-            onPress={zumba}
-          />
-        </ContentWrapper>
-      </Content>
+      <SignInButton
+        title="Entrar"
+        svg={GoogleSvg}
+        onPress={handleSubmit(handleSignIn)}
+      />
     </Container>
   )
 }

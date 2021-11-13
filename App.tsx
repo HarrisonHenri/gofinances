@@ -13,8 +13,8 @@ import AppLoading from 'expo-app-loading'
 import { ThemeProvider } from 'styled-components/native'
 
 import theme from './src/global/styles/theme'
+import { AuthProvider } from './src/hooks/auth'
 import Routes from './src/routes'
-import { SignIn } from './src/screens/SignIn'
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -29,8 +29,10 @@ export default function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      <StatusBar barStyle="light-content" />
-      <SignIn />
+      <AuthProvider>
+        <StatusBar barStyle="light-content" />
+        <Routes />
+      </AuthProvider>
     </ThemeProvider>
   )
 }
