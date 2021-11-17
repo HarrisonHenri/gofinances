@@ -71,6 +71,8 @@ $ yarn start
 - [Victory pie](https://formidable.com/open-source/victory/docs/victory-pie/) - Data visualizations
 - [Styled-Components](https://www.styled-components.com/) - Styles
 - [React native firebase](https://rnfirebase.io/)
+- [Jest](https://jestjs.io/pt-BR/)
+- [React-native testing library](https://github.com/callstack/react-native-testing-library)
 
 ## Contributing
 
